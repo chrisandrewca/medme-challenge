@@ -3,54 +3,64 @@ import logo from './logo.svg';
 import { Counter } from './features/counter/Counter';
 import './App.css';
 
+import { useSelector, useDispatch } from 'react-redux';
+import {
+  createRound,
+  findMatchesForRound,
+  selectRounds
+} from './tournamentSlice';
+
+import { Match } from './features/match/Match';
+// import { createRound, findMatchesForRound } from './api/API';
+
 function App() {
+
+  // const round = createRound({ participantCount: 51 });
+  // console.log({ round });
+
+  // findMatchesForRound(round);
+  // console.log({ round });
+
+  // const round2 = createRound({ participantCount: 26 });
+  // console.log({ round2 });
+
+  // findMatchesForRound(round2);
+  // console.log({ round2 });
+
+  const dispatch = useDispatch();
+  const rounds = useSelector(selectRounds);
+
+  dispatch(createRound({ participantCount: 51 }));
+
+  // locally applied column definitions for tournament grid
+  let gridTemplateColumns = '';
+  for (let i = 0; i < 2; i++) { // TODO 2 rounds
+    gridTemplateColumns += '200px ';
+  }
+
+  let roundOffsets = [0];
+  for (let i = 1; i < 2; i++) {
+    roundOffsets.push(`${roundOffsets[i - 1] + 75}px`);
+  }
+
   return (
-    <div className="App">
-      <header className="App-header">
-        <img src={logo} className="App-logo" alt="logo" />
-        <Counter />
-        <p>
-          Edit <code>src/App.js</code> and save to reload.
-        </p>
-        <span>
-          <span>Learn </span>
-          <a
-            className="App-link"
-            href="https://reactjs.org/"
-            target="_blank"
-            rel="noopener noreferrer"
-          >
-            React
-          </a>
-          <span>, </span>
-          <a
-            className="App-link"
-            href="https://redux.js.org/"
-            target="_blank"
-            rel="noopener noreferrer"
-          >
-            Redux
-          </a>
-          <span>, </span>
-          <a
-            className="App-link"
-            href="https://redux-toolkit.js.org/"
-            target="_blank"
-            rel="noopener noreferrer"
-          >
-            Redux Toolkit
-          </a>
-          ,<span> and </span>
-          <a
-            className="App-link"
-            href="https://react-redux.js.org/"
-            target="_blank"
-            rel="noopener noreferrer"
-          >
-            React Redux
-          </a>
-        </span>
-      </header>
+    <div className="App" style={{ gridTemplateColumns }}>
+      {
+        rounds.map((round, i) => (
+          <div className="round" style={{ border: "1px solid orange", marginTop: roundOffsets[i] }}>
+            {
+              round.matches.map(match => (
+                <Match
+                  id={match.id}
+                  home={match.home}
+                  away={match.away}
+                  winner={match.winner}
+                  onMatchWinner={handleMatchWinner}
+                />))
+            }
+          </div>
+        ))
+      }
     </div>
   );
 }
